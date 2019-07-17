@@ -145,24 +145,6 @@ class DiamondTimingAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResour
       std::map<std::pair<std::string,ChannelKey>,TH2F*> Histos_2_map;
       std::map< ChannelKey, TProfile*> TOTvsT_Profile_map_;
 
-      /*std::map< ChannelKey, TH1F*> T_Histo_map_;
-      std::map< ChannelKey, TH1F*> TOT_Histo_map_;
-      std::map< ChannelKey, TH1F*> ValidT_Histo_map_;
-      std::map< ChannelKey, TH1F*> ValidTOT_Histo_map_;
-      std::map< ChannelKey, TH2F*> TOTvsT_Histo_map_;
-      std::map< ChannelKey, TH2F*> Pad_tomography_220_Hmap_;
-      std::map< ChannelKey, TH2F*> Pad_tomography_210_Hmap_;
-
-      std::map< ChannelKey, TH2F*> TOTvsPlaneMux_Histo_map_;
-      std::map< ChannelKey, TH2F*> TOTvsMH_Histo_map_;
-      std::map< ChannelKey, TH2F*> TOTvsPT_Histo_map_;
-      std::map< ChannelKey, TH2F*> TOTvsTT_Histo_map_;
-
-      std::map< ChannelKey, TH1F*> SPCT_Histo_map_;
-      std::map< ChannelKey, TH1F*> OOT_Histo_map_;
-      std::map< ChannelKey, TH1F*> ValidOOT_Histo_map_;
-      std::map< ChannelKey, TH2F*> TOTvsSPCT_Histo_map_;*/
-
 
       // ---------- correlation histograms ---------------------------
 
@@ -403,136 +385,8 @@ DiamondTimingAnalyzer::initHistograms(const CTPPSDiamondDetId& detId)
         m=channelDir_map_[recHitKey].make<TH2F>((histo_names_2[i]+chName).c_str(), (histo_names_2[i]+chName).c_str(), sizes_2[i][0], sizes_2[i][1], sizes_2[i][2], sizes_2[i][3], sizes_2[i][4], sizes_2[i][5] );
         Histos_2_map.insert(std::pair<std::pair<std::string,ChannelKey>,TH2F*>(std::make_pair(histo_names_2[i],recHitKey),m));
       }
-
-    /*std::string T_Histo_name(chName);myMap
-    T_Histo_name.insert(0, "RAW_T_Distribution_");
-    T_Histo_map_[recHitKey] = channelDir_map_[recHitKey].make<TH1F>(T_Histo_name.c_str(), T_Histo_name.c_str(), 1200, -60, 60 );
-    std::string ValidT_Histo_name(chName);
-    ValidT_Histo_name.insert(0, "VALID_RAW_T_Distribution_");
-    ValidT_Histo_map_[recHitKey] = channelDir_map_[recHitKey].make<TH1F>(ValidT_Histo_name.c_str(), ValidT_Histo_name.c_str(), 1200, -60, 60 );
-
-	std::string SPCT_Histo_name(chName);
-    SPCT_Histo_name.insert(0, "SinglePadCorr_T_Distribution_");
-    SPCT_Histo_map_[recHitKey] = channelDir_map_[recHitKey].make<TH1F>(SPCT_Histo_name.c_str(), SPCT_Histo_name.c_str(), 1200, -60, 60 );
-
-	std::string OOT_Histo_name(chName);
-    OOT_Histo_name.insert(0, "OOT_Distribution_");
-    OOT_Histo_map_[recHitKey] = channelDir_map_[recHitKey].make<TH1F>(OOT_Histo_name.c_str(), OOT_Histo_name.c_str(), 10, -5, 5 );
-	std::string ValidOOT_Histo_name(chName);
-    ValidOOT_Histo_name.insert(0, "ValidOOT_Distribution_");
-    ValidOOT_Histo_map_[recHitKey] = channelDir_map_[recHitKey].make<TH1F>(ValidOOT_Histo_name.c_str(), ValidOOT_Histo_name.c_str(), 10, -5, 5 );
-
-    std::string TOT_Histo_name(chName);
-    TOT_Histo_name.insert(0, "TOT_Distribution_");
-    TOT_Histo_map_[recHitKey] = channelDir_map_[recHitKey].make<TH1F>(TOT_Histo_name.c_str(), TOT_Histo_name.c_str(), 100, -20, 20 );
-    std::string ValidTOT_Histo_name(chName);
-    ValidTOT_Histo_name.insert(0, "ValidTOT_Distribution_");
-    ValidTOT_Histo_map_[recHitKey] = channelDir_map_[recHitKey].make<TH1F>(ValidTOT_Histo_name.c_str(), ValidTOT_Histo_name.c_str(), 100, -20, 20 );
-
-    std::string TOTvsT_Histo_name(chName);
-    TOTvsT_Histo_name.insert(0, "TvsTOT_Distribution_");
-    TOTvsT_Histo_map_[recHitKey] = channelDir_map_[recHitKey].make<TH2F>(TOTvsT_Histo_name.c_str(), TOTvsT_Histo_name.c_str(), 240, 0, 60, 450, -20, 25 );
-
-    std::string TOTvsPlaneMux_Histo_name(chName);
-    TOTvsPlaneMux_Histo_name.insert(0, "TOTvsPlaneMux_Distribution_");
-    TOTvsPlaneMux_Histo_map_[recHitKey] = channelDir_map_[recHitKey].make<TH2F>(TOTvsPlaneMux_Histo_name.c_str(), TOTvsPlaneMux_Histo_name.c_str(), 240, 0, 60, 12, 0, 12 );
-
-    std::string TOTvsMH_Histo_name(chName);
-    TOTvsMH_Histo_name.insert(0, "TOTvsMH_Distribution_");
-    TOTvsMH_Histo_map_[recHitKey] = channelDir_map_[recHitKey].make<TH2F>(TOTvsMH_Histo_name.c_str(), TOTvsMH_Histo_name.c_str(), 240, 0, 60, 2, 0, 2 );
-
-    std::string TOTvsPT_Histo_name(chName);
-    TOTvsPT_Histo_name.insert(0, "TOTvsPT_Distribution_");
-    TOTvsPT_Histo_map_[recHitKey] = channelDir_map_[recHitKey].make<TH2F>(TOTvsPT_Histo_name.c_str(), TOTvsPT_Histo_name.c_str(), 240, 0, 60, 20, 0, 20 );
-
-    std::string TOTvsTT_Histo_name(chName);
-    TOTvsTT_Histo_name.insert(0, "TOTvsTT_Distribution_");
-    TOTvsTT_Histo_map_[recHitKey] = channelDir_map_[recHitKey].make<TH2F>(TOTvsTT_Histo_name.c_str(), TOTvsTT_Histo_name.c_str(), 240, 0, 60, 12, 0, 12 );
-
-    std::string PadTomo220_Histo_name(chName);
-    PadTomo220_Histo_name.insert(0, "Pad tomography 220");
-    Pad_tomography_220_Hmap_[recHitKey] = channelDir_map_[recHitKey].make<TH2F>(PadTomo220_Histo_name.c_str(), PadTomo220_Histo_name.c_str(), 1000, -100, 100, 1000, -100, 100);
-
-    std::string PadTomo210_Histo_name(chName);
-    PadTomo210_Histo_name.insert(0, "Pad tomography 210");
-    Pad_tomography_210_Hmap_[recHitKey] = channelDir_map_[recHitKey].make<TH2F>(PadTomo210_Histo_name.c_str(), PadTomo210_Histo_name.c_str(), 1000, -100, 100, 1000, -100, 100);
-
-
-    std::string TOTvsSPCT_Histo_name(chName);
-    TOTvsSPCT_Histo_name.insert(0, "TOTvsSPCT_Distribution_");
-    TOTvsSPCT_Histo_map_[recHitKey] = channelDir_map_[recHitKey].make<TH2F>(TOTvsSPCT_Histo_name.c_str(), TOTvsSPCT_Histo_name.c_str(), 240, 0, 60, 450, -20, 25 );*/
-
-
    }
-
 }
-
-
-void fill_histos_1(names1 name,std::string key,std::map<std::string,std::map<ChannelKey,TH1F*>> &m,auto& recHit,ChannelKey recHitKey,DiamondDetectorClass DiamondDet,const CTPPSDiamondDetId& detId){
-  std::map<std::string,std::map<ChannelKey,TH1F*>>::iterator iter=m.find(key);
-
-    if(iter != m.end()){
-        std::map<ChannelKey,TH1F*> &innerMap = iter->second;
-        std::map<ChannelKey,TH1F*>::iterator innerit = innerMap.find( recHitKey );
-       if( innerit != innerMap.end() ){
-          switch(name) {
-            case 0 : innerit->second->Fill( recHit.getT() );
-            case 1 : innerit->second->Fill(recHit.getToT());
-            case 2 : innerit->second->Fill(recHit.getOOTIndex());
-            case 3 : innerit->second->Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()));
-            case 4 : innerit->second->Fill(DiamondDet.GetTime_SPC(detId.arm(), detId.plane(),detId.channel()));
-            case 5 : innerit->second->Fill(DiamondDet.GetPadOOT(detId.arm(), detId.plane(),detId.channel()));
-            case 6 : innerit->second->Fill(DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()));
-          }
-      }
-}
-}
-
-void fill_histos_2(names2 name,std::string key,std::map<std::string,std::map<ChannelKey,TH2F*>> &m,auto& recHit,ChannelKey recHitKey,
-  DiamondDetectorClass DiamondDet,std::map< std::pair< int , int >, int> Pixel_Mux_map_,const CTPPSDiamondDetId& detId,Station_id_ sid){
-  std::map<std::string,std::map<ChannelKey,TH2F*>>::iterator iter=m.find(key);
-
-    for(std::map<std::string,std::map<ChannelKey,TH2F*>>::iterator it = m.begin();
-    it != m.end(); ++it)
-    {
-      std::cout << "it" << it->first << "\n";
-
-      for(std::map<ChannelKey,TH2F*>::iterator innerit = (*it).second.begin();
-      innerit != (*it).second.end(); ++innerit)
-      {
-        std::cout << innerit->first.channel << " " << innerit->second << "\n";
-      }
-    }
-
-
-    std::cout<<"GGGGGGGGGGGGGGGGGGGG"<<recHitKey.sector<<" "<<recHitKey.plane<<" "<<recHitKey.channel<<"GGGGGGGGGGGGGGGGg"<<std::endl;
-    if(iter != m.end()){
-        std::map<ChannelKey,TH2F*> &innerMap = iter->second;
-        std::map<ChannelKey,TH2F*>::iterator innerit = innerMap.find( recHitKey );
-        std::cout<<"AAAAAAAAAAAAAAAAAAA"<<recHitKey.sector<<" "<<recHitKey.plane<<" "<<recHitKey.channel<<"AAAAAAAAAAAAAAAAAAA"<<std::endl;
-        if( innerit != innerMap.end() ){
-          std::cout<<"WIETnam"<<recHitKey.sector<<" "<<recHitKey.plane<<" "<<recHitKey.channel<<"WIETnam"<<std::endl;
-           switch(name) {
-             case 0 : innerit->second->Fill( DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), DiamondDet.GetTime_SPC(detId.arm(),detId.plane(),detId.channel()));
-             case 1 : innerit->second->Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), DiamondDet.GetMux(detId.arm(), detId.plane()));
-             case 2 : innerit->second->Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), DiamondDet.GetMH(detId.arm(), detId.plane(),detId.channel()));
-             case 3 : innerit->second->Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), Pixel_Mux_map_[std::make_pair(detId.arm(),sid)]);
-             case 4 : innerit->second->Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()),  DiamondDet.GetTrackMuxInSector(detId.arm()));
-             case 5 : innerit->second->Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()));
-           }
-       }
-}
-}
-
-  /*if (mid==2){
-    if(iter2 != m2.end()){
-        std::map<ChannelKey,TH2F*> &innerMap = iter2->second;
-        std::map<ChannelKey,TH2F*>::iterator innerit = innerMap.find( recHitKey );
-       if( innerit != innerMap.end() )
-          innerit->second->Fill( recHit.getT() );
-      }
-  }*/
-
 
 // ------------ method called for each event  ------------
 void
@@ -639,19 +493,6 @@ if (!(Sector_TBA[0] || Sector_TBA[1])) return;
 
 
 
-/*for (std::map <std::string, std::map<ChannelKey, TH1F*>>::iterator it = Histos_1_map.begin(); it != Histos_1_map.end(); ++it){
-std::cout << it->first << " : ";
-std::map<ChannelKey, TH1F*> &internal_map = it->second;
-for (std::map<ChannelKey, TH1F*>::iterator it2 = internal_map.begin(); it2 != internal_map.end(); ++it2){
-  if (it2 != internal_map.begin())
-      std::cout << ",";
-  std::cout << "unprintable channel key" << ":" << it2->second;
-}
-std::cout << std::endl;
-}*/
-
-
-
 
   for (const auto& recHits : *timingRecHit) //rechits = array of hits in one channel
   {
@@ -683,66 +524,12 @@ std::cout << std::endl;
 
 		if (((recHit.getOOTIndex() != (int)((DiamondDet.GetSPCMap())[recHitKey].offset/25) ) &&  valid_OOT_!=-1) ||  recHit.getMultipleHits()) continue;
 
-
-		//if (detId.plane()==3) std::cout << "plane "<< detId.plane() << " pad " << detId.channel() << " x value " << recHit.getX() << " y value " << recHit.getY() << std::endl;
-
-    //std::cout<<"NAPALMSTRIKEEEEEEEEEEEEEEEEEEEEEEE"<<std::endl;
-
-    //std::cout<<Histos_1_map["RAW_T_Distribution_"][recHitKey]<<std::endl;
-
-    /*for (std::map <std::string, std::map<ChannelKey, TH1F*>>::iterator it = Histos_1_map.begin(); it != Histos_1_map.end(); ++it){
-    std::cout << it->first << " : ";
-    std::map<ChannelKey, TH1F*> &internal_map = it->second;
-    for (std::map<ChannelKey, TH1F*>::iterator it2 = internal_map.begin(); it2 != internal_map.end(); ++it2){
-      if (it2 != internal_map.begin())
-          std::cout << ",";
-      std::cout << "unprintable channel key" << ":" << it2->second;
-    }
-    std::cout << std::endl;
-  }*/
-
-    //segfault point, now fixed
-
-    /*std::map<std::string,std::map<ChannelKey,TH1F*>>::iterator iter=Histos_1_map.find("RAW_T_Distribution_");
-
-    if( iter != Histos_1_map.end() ) {
-       std::map<ChannelKey,TH1F*> &innerMap = iter->second;
-       std::map<ChannelKey,TH1F*>::iterator innerit = innerMap.find( recHitKey );
-       if( innerit != innerMap.end() )
-          innerit->second->Fill( recHit.getT() );
-    }*/
-
-    //fill_histos_1(RAW_T_Distribution_,"RAW_T_Distribution_",Histos_1_map,recHit,recHitKey,DiamondDet,detId);
-    //fill_histos_1(TOT_Distribution_,"TOT_Distribution_",Histos_1_map,recHit,recHitKey,DiamondDet,detId);
-    //fill_histos_1(OOT_Distribution_,"OOT_Distribution_",Histos_1_map,recHit,recHitKey,DiamondDet,detId);
-
-    //std::cout<<"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"<<std::endl;
-
     Histos_1_map[std::make_pair("RAW_T_Distribution_",recHitKey)]->Fill( recHit.getT() );
     Histos_1_map[std::make_pair("TOT_Distribution_",recHitKey)]->Fill( recHit.getToT() );
     Histos_1_map[std::make_pair("OOT_Distribution_",recHitKey)]->Fill( recHit.getOOTIndex() );
-		/*T_Histo_map_[recHitKey]-> Fill( recHit.getT() );
-		TOT_Histo_map_[recHitKey]-> Fill( recHit.getToT() );
-		OOT_Histo_map_[recHitKey]-> Fill( recHit.getOOTIndex() );*/
-
-    //std::cout<<"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"<<std::endl;
 
 		if (DiamondDet.PadActive(detId.arm(), detId.plane(),detId.channel())) // T and Tot present
 		{
-      /*fill_histos_1(ValidTOT_Distribution_,"ValidTOT_Distribution_",Histos_1_map,recHit,recHitKey,DiamondDet,detId);
-      fill_histos_1(SinglePadCorr_T_Distribution_,"SinglePadCorr_T_Distribution_",Histos_1_map,recHit,recHitKey,DiamondDet,detId);
-      fill_histos_1(ValidOOT_Distribution_,"ValidOOT_Distribution_",Histos_1_map,recHit,recHitKey,DiamondDet,detId);
-      fill_histos_1(VALID_RAW_T_Distribution_,"VALID_RAW_T_Distribution_",Histos_1_map,recHit,recHitKey,DiamondDet,detId);
-
-      std::cout<<"NAPALMSTRIKE"<<recHitKey.sector<<" "<<recHitKey.plane<<" "<<recHitKey.channel<<"NAPALMSTRIKE"<<std::endl;
-
-      fill_histos_2(TOTvsSPCT_Distribution_,"TOTvsSPCT_Distribution_",Histos_2_map,recHit,recHitKey,DiamondDet,Pixel_Mux_map_,detId,STATION_220_M_ID);
-      fill_histos_2(TOTvsPlaneMux_Distribution_,"TOTvsPlaneMux_Distribution_",Histos_2_map,recHit,recHitKey,DiamondDet,Pixel_Mux_map_,detId,STATION_220_M_ID);
-      fill_histos_2(TOTvsMH_Distribution_,"TOTvsMH_Distribution_",Histos_2_map,recHit,recHitKey,DiamondDet,Pixel_Mux_map_,detId,STATION_220_M_ID);
-      fill_histos_2(TOTvsPT_Distribution_,"TOTvsPT_Distribution_",Histos_2_map,recHit,recHitKey,DiamondDet,Pixel_Mux_map_,detId,STATION_220_M_ID);
-      fill_histos_2(TOTvsTT_Distribution_,"TOTvsTT_Distribution_",Histos_2_map,recHit,recHitKey,DiamondDet,Pixel_Mux_map_,detId,STATION_220_M_ID);
-      fill_histos_2(TvsTOT_Distribution_,"TvsTOT_Distribution_",Histos_2_map,recHit,recHitKey,DiamondDet,Pixel_Mux_map_,detId,STATION_220_M_ID);*/
-
 
 			Histos_1_map[std::make_pair("ValidTOT_Distribution_",recHitKey)]-> Fill( DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()) );
 			Histos_1_map[std::make_pair("SinglePadCorr_T_Distribution_",recHitKey)]-> Fill( DiamondDet.GetTime_SPC(detId.arm(), detId.plane(),detId.channel()));
@@ -753,72 +540,9 @@ std::cout << std::endl;
 			Histos_2_map[std::make_pair("TOTvsPT_Distribution_",recHitKey)]-> Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), Pixel_Mux_map_[std::make_pair(detId.arm(),STATION_220_M_ID)]);
 			Histos_2_map[std::make_pair("TOTvsTT_Distribution_",recHitKey)]-> Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()),  DiamondDet.GetTrackMuxInSector(detId.arm()));
 
-			// comment following 2 lines if running on 2017 data samples
 			Histos_2_map[std::make_pair("TvsTOT_Distribution_",recHitKey)]-> Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()));
 
 			Histos_1_map[std::make_pair("VALID_RAW_T_Distribution_",recHitKey)]-> Fill( DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()) );
-
-
-			////////////////////////////////////////////////////
-			// Run dependent code 2017 start
-			////////////////////////////////////////////////////
-
-			// standard runs
-			//TOTvsT_Histo_map_[recHitKey]-> Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()));
-			//ValidT_Histo_map_[recHitKey]-> Fill( DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()) );
-
-			// 5 windows std clock
-			//if (detId.arm()==0 && (detId.plane()==0 || (detId.plane()==1 && detId.channel()>6)))
-			//{
-			//	double patched_T = DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()) - 12.5;
-			//	if (patched_T < 0.0) patched_T+=25.0;
-			//	TOTvsT_Histo_map_[recHitKey]-> Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), patched_T);
-			//	ValidT_Histo_map_[recHitKey]-> Fill( patched_T );
-			//}
-			//else
-			//{
-			//	ValidT_Histo_map_[recHitKey]-> Fill( DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()) );
-			//	TOTvsT_Histo_map_[recHitKey]-> Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()));
-			//}
-
-
-
-			// //300122
-			//if (detId.arm()==0 && (detId.plane()==0 || detId.plane()==2 || detId.channel()>6))
-			//{
-			//	double patched_T = DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()) - 12.5;
-			//	if (patched_T < 0.0) patched_T+=25.0;
-			//	TOTvsT_Histo_map_[recHitKey]-> Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), patched_T);
-			//	ValidT_Histo_map_[recHitKey]-> Fill( patched_T );
-			//}
-			//else
-			//{
-			//	ValidT_Histo_map_[recHitKey]-> Fill( DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()) );
-			//	TOTvsT_Histo_map_[recHitKey]-> Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()));
-			//}
-
-
-
-			//// 300155
-			//if (detId.arm()==1 && ((detId.plane()==1 && detId.channel()==6) || (detId.plane()==3 && detId.channel()<7)))
-			//{
-			//	double patched_T = DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()) - 12.5;
-			//	if (patched_T < 0.0) patched_T+=25.0;
-			//	TOTvsT_Histo_map_[recHitKey]-> Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), patched_T);
-			//	ValidT_Histo_map_[recHitKey]-> Fill( patched_T );
-			//}
-			//else
-			//{
-			//	ValidT_Histo_map_[recHitKey]-> Fill( DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()) );
-			//	TOTvsT_Histo_map_[recHitKey]-> Fill(DiamondDet.GetToT(detId.arm(), detId.plane(),detId.channel()), DiamondDet.GetTime(detId.arm(), detId.plane(),detId.channel()));
-			//}
-
-
-			////////////////////////////////////////////////////
-			// Run dependent code 2017 end
-			////////////////////////////////////////////////////
-
-
 		}
     }
   }
@@ -1329,52 +1053,28 @@ DiamondTimingAnalyzer::beginJob()
     }
   }
 
-	/*dir_cyl_TPTI_V[0][std::make_pair(0,1)]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/TPTimeInfo/plane0_1" );
-	dir_cyl_TPTI_V[0][std::make_pair(0,2)]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/TPTimeInfo/plane0_2" );
-	dir_cyl_TPTI_V[0][std::make_pair(0,3)]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/TPTimeInfo/plane0_3" );
-	dir_cyl_TPTI_V[0][std::make_pair(1,2)]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/TPTimeInfo/plane1_2" );
-	dir_cyl_TPTI_V[0][std::make_pair(1,3)]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/TPTimeInfo/plane1_3" );
-	dir_cyl_TPTI_V[0][std::make_pair(2,3)]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/TPTimeInfo/plane2_3" );
-	dir_cyl_TPTI_V[1][std::make_pair(0,1)]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/TPTimeInfo/plane0_1" );
-	dir_cyl_TPTI_V[1][std::make_pair(0,2)]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/TPTimeInfo/plane0_2" );
-	dir_cyl_TPTI_V[1][std::make_pair(0,3)]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/TPTimeInfo/plane0_3" );
-	dir_cyl_TPTI_V[1][std::make_pair(1,2)]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/TPTimeInfo/plane1_2" );
-	dir_cyl_TPTI_V[1][std::make_pair(1,3)]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/TPTimeInfo/plane1_3" );
-	dir_cyl_TPTI_V[1][std::make_pair(2,3)]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/TPTimeInfo/plane2_3" );*/
-
 	dir_cyl_L2Res_V.resize(2);
-	dir_cyl_L2Res_V[0][0]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/L2Res/plane0" );
-	dir_cyl_L2Res_V[0][1]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/L2Res/plane1" );
-	dir_cyl_L2Res_V[0][2]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/L2Res/plane2" );
-	dir_cyl_L2Res_V[0][3]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/L2Res/plane3" );
-	dir_cyl_L2Res_V[1][0]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/L2Res/plane0" );
-	dir_cyl_L2Res_V[1][1]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/L2Res/plane1" );
-	dir_cyl_L2Res_V[1][2]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/L2Res/plane2" );
-	dir_cyl_L2Res_V[1][3]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/L2Res/plane3" );
-
 	dir_cyl_L2_3p_Res_V.resize(2);
-	dir_cyl_L2_3p_Res_V[0][0]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/L2_3p_Res/plane0" );
-	dir_cyl_L2_3p_Res_V[0][1]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/L2_3p_Res/plane1" );
-	dir_cyl_L2_3p_Res_V[0][2]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/L2_3p_Res/plane2" );
-	dir_cyl_L2_3p_Res_V[0][3]=fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/L2_3p_Res/plane3" );
-	dir_cyl_L2_3p_Res_V[1][0]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/L2_3p_Res/plane0" );
-	dir_cyl_L2_3p_Res_V[1][1]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/L2_3p_Res/plane1" );
-	dir_cyl_L2_3p_Res_V[1][2]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/L2_3p_Res/plane2" );
-	dir_cyl_L2_3p_Res_V[1][3]=fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/L2_3p_Res/plane3" );
 
+  int pl_num=4;
+
+  for (unsigned int i=0; i<std::size(sector_names); i++){
+    for (int j=0; j<pl_num; j++){
+      dir_cyl_L2Res_V[i][j]=fs_->mkdir( "CTPPS/TimingDiamond/"+sector_names[i]+"/station 220cyl/cyl_hr/L2Res/plane"+std::to_string(j) );
+      dir_cyl_L2_3p_Res_V[i][j]=fs_->mkdir( "CTPPS/TimingDiamond/"+sector_names[i]+"/station 220cyl/cyl_hr/L2_3p_Res/plane"+std::to_string(j) );
+    }
+  }
 
 
 
 	dir_plane_VV.push_back(std::vector<TFileDirectory>());
 	dir_plane_VV.push_back(std::vector<TFileDirectory>());
-	dir_plane_VV[0].push_back(fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/plane 0" ));
-	dir_plane_VV[0].push_back(fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/plane 1" ));
-	dir_plane_VV[0].push_back(fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/plane 2" ));
-	dir_plane_VV[0].push_back(fs_->mkdir( "CTPPS/TimingDiamond/sector 45/station 220cyl/cyl_hr/plane 3" ));
-	dir_plane_VV[1].push_back(fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/plane 0" ));
-	dir_plane_VV[1].push_back(fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/plane 1" ));
-	dir_plane_VV[1].push_back(fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/plane 2" ));
-	dir_plane_VV[1].push_back(fs_->mkdir( "CTPPS/TimingDiamond/sector 56/station 220cyl/cyl_hr/plane 3" ));
+
+  for (unsigned int i=0; i<std::size(sector_names); i++){
+    for (int j=0; j<pl_num; j++){
+      dir_plane_VV[i].push_back(fs_->mkdir( "CTPPS/TimingDiamond/"+sector_names[i]+"/station 220cyl/cyl_hr/plane "+std::to_string(j) ));
+    }
+  }
 
 	for (int sec_number=0; sec_number < MAX_SECTOR_NUMBER; sec_number++)
 	{
@@ -1800,8 +1500,6 @@ DiamondTimingAnalyzer::endJob()
 	///////////////////////////
     // deriving SPC corrections
     ///////////////////////////
-    //for ( auto& Histo_handle : Histos_2_map ) //rechit
-    //{
 
     for(std::map<std::pair<std::string,ChannelKey>,TH2F*>::iterator iter=Histos_2_map.begin(); iter!=Histos_2_map.end(); ++iter)
     {
