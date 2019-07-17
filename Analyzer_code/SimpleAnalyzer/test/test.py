@@ -36,10 +36,10 @@ options.register ('validOOT',
 				  VarParsing.multiplicity.singleton,
 				  VarParsing.varType.int,
 				  "valid OOT slice")
-				  
-				  
+
+
 options.parseArguments()
-				  
+
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -47,7 +47,7 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
-# load DQM framework 
+# load DQM framework
 #process.load("DQM.Integration.config.environment_cfi")
 #process.dqmEnv.subSystemFolder = "CTPPS"
 #process.dqmEnv.eventInfoFolder = "EventInfo"
@@ -63,27 +63,27 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 # )
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-    *(
     #'/store/data/Run2018C/ZeroBias/AOD/PromptReco-v2/000/319/466/00000/D4CDC51F-9486-E811-8D08-FA163E0E63D7.root',
 #'/store/data/Run2018C/ZeroBias/AOD/PromptReco-v2/000/319/466/00000/B4F35FF7-9986-E811-AD21-FA163E619822.root',
 #'/store/data/Run2018C/ZeroBias/AOD/PromptReco-v2/000/319/466/00000/9260F9EF-9986-E811-B6FE-FA163EF4135C.root',
 #'/store/data/Run2018C/ZeroBias/AOD/PromptReco-v2/000/319/466/00000/76EF31D1-9986-E811-A28F-FA163EEB45BD.root',
 #'/store/data/Run2018C/ZeroBias/AOD/PromptReco-v2/000/319/466/00000/6EB624BF-9086-E811-8DB6-FA163E306BAD.root',
 #'/store/data/Run2018C/ZeroBias/AOD/PromptReco-v2/000/319/466/00000/12EE7D0D-9A86-E811-92E2-FA163E04B59.root',
-'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/00302FB3-1CB4-E811-96B2-FA163EC9F152.root',
-'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/0246C0FF-21B4-E811-B82D-FA163E4A6585.root',
-'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/024F9C3C-1EB4-E811-84C9-FA163EFF8B83.root',
-'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/0645A771-2AB4-E811-95A8-FA163E4C2520.root',
-'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/08EB25DD-2EB4-E811-9C78-02163E00B262.root',
-'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/0CFD4E19-22B4-E811-B2C2-02163E016469.root',
-'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/10335B7A-2AB4-E811-A125-FA163ED383EE.root',
-'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/10B9DB48-1EB4-E811-956C-FA163ECAADB8.root',
-'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/129AA2CD-1CB4-E811-9E4F-FA163EDA78EE.root',
-'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/16ED4249-18B4-E811-8446-02163E01A068.root',
-'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/1867BEB4-B9B4-E811-BD84-02163E010D99.root',
-'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/1A21EF36-1EB4-E811-9871-FA163ED8A558.root',
-'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/1AA81129-1EB4-E811-BCB5-FA163E0ED030.root'
+#'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/00302FB3-1CB4-E811-96B2-FA163EC9F152.root',
+#'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/0246C0FF-21B4-E811-B82D-FA163E4A6585.root',
+#'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/024F9C3C-1EB4-E811-84C9-FA163EFF8B83.root',
+#'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/0645A771-2AB4-E811-95A8-FA163E4C2520.root',
+#'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/08EB25DD-2EB4-E811-9C78-02163E00B262.root',
+#'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/0CFD4E19-22B4-E811-B2C2-02163E016469.root',
+#'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/10335B7A-2AB4-E811-A125-FA163ED383EE.root',
+#'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/10B9DB48-1EB4-E811-956C-FA163ECAADB8.root',
+#'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/129AA2CD-1CB4-E811-9E4F-FA163EDA78EE.root',
+#'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/16ED4249-18B4-E811-8446-02163E01A068.root',
+#'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/1867BEB4-B9B4-E811-BD84-02163E010D99.root',
+#'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/1A21EF36-1EB4-E811-9871-FA163ED8A558.root',
+#'/store/data/Run2018D/ZeroBias/AOD/PromptReco-v2/000/322/332/00000/1AA81129-1EB4-E811-BCB5-FA163E0ED030.root'
 #'/store/data/Run2018B/ZeroBias1/AOD/PromptReco-v2/000/318/361/00000/20499182-0C78-E811-AC77-A4BF0112BD52.root',
+'/store/group/dpg_ctpps/comm_ctpps/CalibrationDevel/10B9DB48-1EB4-E811-956C-FA163ECAADB8.root'
 #'/store/data/Run2018B/ZeroBias1/AOD/PromptReco-v2/000/318/361/00000/6E5F383F-0D78-E811-A8E6-FA163ECDEF72.root',
 #'/store/data/Run2018B/ZeroBias1/AOD/PromptReco-v2/000/318/361/00000/BE61E668-0B78-E811-BD3D-FA163E60E3B4.root',
 #'/store/data/Run2018B/ZeroBias1/AOD/PromptReco-v2/000/318/361/00000/EE9F884F-0A78-E811-8B9E-FA163EA96792.root',
@@ -176,11 +176,10 @@ process.source = cms.Source("PoolSource",
 #'/store/data/Run2017B/ZeroBias/AOD/17Nov2017-v1/20000/E4ACE8A0-96D3-E711-ABA4-44A842CFD667.root',
 #'/store/data/Run2017B/ZeroBias/AOD/17Nov2017-v1/20000/E4A46922-1FD3-E711-AD44-008CFA56D794.root'
     )
-    )
 )
 
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '101X_dataRun2_HLT_v7', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')
 
 
 
@@ -192,7 +191,7 @@ process.diamondTimingAnalyzer = cms.EDAnalyzer('DiamondTimingAnalyzer',
  tagDigi = cms.InputTag("ctppsDiamondRawToDigi", "TimingDiamond"),
  tagRecHit = cms.InputTag("ctppsDiamondRecHits"),
  tagPixelLocalTrack = cms.InputTag("ctppsPixelLocalTracks"),
- tagLocalTrack = cms.InputTag("ctppsDiamondLocalTracks"), 
+ tagLocalTrack = cms.InputTag("ctppsDiamondLocalTracks"),
  tagCalibrationFile = cms.string(options.calibFile),
  tagValidOOT = cms.int32(options.validOOT),
  Ntracks_Lcuts = cms.vint32([-1,1,-1,1]),
@@ -202,13 +201,13 @@ process.diamondTimingAnalyzer = cms.EDAnalyzer('DiamondTimingAnalyzer',
 #process.PixelMux_Filter = cms.EDFilter('PixelMux_Filter',
 # tagPixelLocalTrack = cms.InputTag("ctppsPixelLocalTracks"),
 # Ntracks_Lcuts = cms.vint32([-1,1,-1,1]),
-# Ntracks_Ucuts = cms.vint32([-1,3,-1,3]), 
+# Ntracks_Ucuts = cms.vint32([-1,3,-1,3]),
 #)
 
 #process.TimingMux_Filter = cms.EDFilter('TimingMux_Filter',
 # tagTimingLocalTrack = cms.InputTag("ctppsDiamondLocalTrack"),
 # TTracksMux_Lcuts = cms.vint32([-1,-1]),
-# TTracksMux_Ucuts = cms.vint32([-1,-1]), 
+# TTracksMux_Ucuts = cms.vint32([-1,-1]),
 #)
 
 process.TFileService = cms.Service("TFileService",
@@ -219,7 +218,7 @@ process.TFileService = cms.Service("TFileService",
 process.path = cms.Path(
    ctppsDiamondLocalReconstruction * process.diamondTimingAnalyzer
 )
- 
+
 
 
 process.schedule = cms.Schedule(
