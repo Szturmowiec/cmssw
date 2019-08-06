@@ -141,6 +141,12 @@ class DiamondTimingAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResour
       std::map<MapKey,TH1F*> Histos_TH1F;
 			std::map<MapKey,TH2F*> Histos_TH2F;
       std::map< ChannelKey, TProfile*> TOTvsT_Profile_map_;
+			std::map<ChannelKey, TH1F*> Resolution_L2_3p_histo_map_;
+			std::map<ChannelKey, TH1F*> TrkTime_L2_3p_histo_map_;
+			std::map<ChannelKey, TH1F*> TrkExpectedRes_L2_3p_histo_map_;
+			std::map<ChannelKey, TH1F*> Resolution_L2_histo_map_;
+			std::map<ChannelKey, TH1F*> TrkExpectedRes_L2_histo_map_;
+			std::map<ChannelKey, TH1F*> TrkTime_L2_histo_map_;
 
 
       // ---------- correlation histograms ---------------------------
@@ -837,18 +843,27 @@ for (const auto& LocalTrack_mapIter : DiamondDet.GetDiamondTrack_map()) // loop 
       sizes_L2_1.push_back({{1200,-60,60}});
       sizes_L2_1.push_back({{1000,0,2}});
 
-      if (Histos_TH1F.find(MapKey("Resolution_L2_histo_map_",-1,sec_number,pl_mark,Marked_hit_channel))==Histos_TH1F.end()) // creta pair histos if do not exist
-      {
-				for(unsigned int i=0; i<size(names_histos_L2_1); i++){
-					std::string name=std::get<0>(names_histos_L2_1[i])+std::to_string(sec_number)+"_plane_"+std::to_string(pl_mark)+"_channel_"+std::to_string(Marked_hit_channel);
-					MapKey mk=MapKey(std::get<1>(names_histos_L2_1[i]),-1,sec_number,pl_mark,Marked_hit_channel);
-					Histos_TH1F[mk]=dir_cyl_L2Res_V[sec_number][pl_mark].make<TH1F>(name.c_str(), name.c_str(), sizes_L2_1[i][0], sizes_L2_1[i][1], sizes_L2_1[i][2] );
-				}
-      }
+			if (Resolution_L2_histo_map_.find(ChannelKey(sec_number,pl_mark,Marked_hit_channel))==Resolution_L2_histo_map_.end()) // creta pair histos if do not exist
+			{
+				std::string Histo_name = "L2_resolution_DT_sec_"+std::to_string(sec_number)+"_plane_"+std::to_string(pl_mark)+"_channel_"+
+											std::to_string(Marked_hit_channel);
+				Resolution_L2_histo_map_[ChannelKey(sec_number,pl_mark,Marked_hit_channel)] =
+					dir_cyl_L2Res_V[sec_number][pl_mark].make<TH1F>(Histo_name.c_str(), Histo_name.c_str(), 1200, -60, 60 );
 
-      Histos_TH1F[MapKey("Resolution_L2_histo_map_",-1,sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_hit_difference);
-      Histos_TH1F[MapKey("TrkTime_L2_histo_map_",-1,sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_track_time);
-      Histos_TH1F[MapKey("TrkExpectedRes_L2_histo_map_",-1,sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_track_precision);
+				Histo_name = "L2_partialTrk_Time_sec_"+std::to_string(sec_number)+"_plane_"+std::to_string(pl_mark)+"_channel_"+
+											std::to_string(Marked_hit_channel);
+				TrkTime_L2_histo_map_[ChannelKey(sec_number,pl_mark,Marked_hit_channel)] =
+					dir_cyl_L2Res_V[sec_number][pl_mark].make<TH1F>(Histo_name.c_str(), Histo_name.c_str(), 1200, -60, 60 );
+
+				Histo_name = "L2_partialTrk_ExpectedRes_sec_"+std::to_string(sec_number)+"_plane_"+std::to_string(pl_mark)+"_channel_"+
+											std::to_string(Marked_hit_channel);
+				TrkExpectedRes_L2_histo_map_[ChannelKey(sec_number,pl_mark,Marked_hit_channel)] =
+					dir_cyl_L2Res_V[sec_number][pl_mark].make<TH1F>(Histo_name.c_str(), Histo_name.c_str(), 1000, 0, 2 );
+			}
+
+			Resolution_L2_histo_map_[ChannelKey(sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_hit_difference);
+			TrkTime_L2_histo_map_[ChannelKey(sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_track_time);
+			TrkExpectedRes_L2_histo_map_[ChannelKey(sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_track_precision);
 
     }
   }
@@ -962,18 +977,27 @@ for (const auto& LocalTrack_mapIter : DiamondDet.GetDiamondTrack_map()) // loop 
 		sizes_L2_2.push_back({{1200,-60,60}});
 		sizes_L2_2.push_back({{1000,0,2}});
 
-    if (Histos_TH1F.find(MapKey("Resolution_L2_3p_histo_map_",-1,sec_number,pl_mark,Marked_hit_channel))==Histos_TH1F.end()) // creta pair histos if do not exist
+    if (Resolution_L2_3p_histo_map_.find(ChannelKey(sec_number,pl_mark,Marked_hit_channel))==Resolution_L2_3p_histo_map_.end()) // creta pair histos if do not exist
     {
-			for(unsigned int i=0; i<size(names_histos_L2_2); i++){
-				std::string name=std::get<0>(names_histos_L2_2[i])+std::to_string(sec_number)+"_plane_"+std::to_string(pl_mark)+"_channel_"+std::to_string(Marked_hit_channel);
-				MapKey mk=MapKey(std::get<1>(names_histos_L2_2[i]),-1,sec_number,pl_mark,Marked_hit_channel);
-				Histos_TH1F[mk]=dir_cyl_L2_3p_Res_V[sec_number][pl_mark].make<TH1F>(name.c_str(), name.c_str(), sizes_L2_2[i][0], sizes_L2_2[i][1], sizes_L2_2[i][2] );
-			}
+			std::string Histo_name = "L2_3p_resolution_DT_sec_"+std::to_string(sec_number)+"_plane_"+std::to_string(pl_mark)+"_channel_"+
+										std::to_string(Marked_hit_channel);
+			Resolution_L2_3p_histo_map_[ChannelKey(sec_number,pl_mark,Marked_hit_channel)] =
+				dir_cyl_L2_3p_Res_V[sec_number][pl_mark].make<TH1F>(Histo_name.c_str(), Histo_name.c_str(), 1200, -60, 60 );
+
+			Histo_name = "L2_3p_partialTrk_Time_sec_"+std::to_string(sec_number)+"_plane_"+std::to_string(pl_mark)+"_channel_"+
+										std::to_string(Marked_hit_channel);
+			TrkTime_L2_3p_histo_map_[ChannelKey(sec_number,pl_mark,Marked_hit_channel)] =
+				dir_cyl_L2_3p_Res_V[sec_number][pl_mark].make<TH1F>(Histo_name.c_str(), Histo_name.c_str(), 1200, -60, 60 );
+
+			Histo_name = "L2_3p_partialTrk_ExpectedRes_sec_"+std::to_string(sec_number)+"_plane_"+std::to_string(pl_mark)+"_channel_"+
+										std::to_string(Marked_hit_channel);
+			TrkExpectedRes_L2_3p_histo_map_[ChannelKey(sec_number,pl_mark,Marked_hit_channel)] =
+				dir_cyl_L2_3p_Res_V[sec_number][pl_mark].make<TH1F>(Histo_name.c_str(), Histo_name.c_str(), 1000, 0, 2 );
     }
 
-    Histos_TH1F[MapKey("Resolution_L2_3p_histo_map_",-1,sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_hit_difference);
-    Histos_TH1F[MapKey("TrkTime_L2_3p_histo_map_",-1,sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_track_time);
-    Histos_TH1F[MapKey("TrkExpectedRes_L2_3p_histo_map_",-1,sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_track_precision);
+		Resolution_L2_3p_histo_map_[ChannelKey(sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_hit_difference);
+		TrkTime_L2_3p_histo_map_[ChannelKey(sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_track_time);
+		TrkExpectedRes_L2_3p_histo_map_[ChannelKey(sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_track_precision);
 
   }
 
@@ -1409,78 +1433,73 @@ DiamondTimingAnalyzer::endJob()
 			for (int ch_id=0; ch_id < CHANNELS_X_PLANE; ch_id ++)
 			{
 
-				ChannelKey chk(sec_id,pl_id,ch_id);
-        MapKey histo_key2=MapKey("Resolution_L2_histo_map_",-1,sec_id,pl_id,ch_id);
-
-				if (Histos_TH1F.find(histo_key2)!=Histos_TH1F.end())
+				ChannelKey histo_key(sec_id,pl_id,ch_id);
+				if (Resolution_L2_histo_map_.find(histo_key)!=Resolution_L2_histo_map_.end())
 				{
-					if (Histos_TH1F[histo_key2]->GetEntries() > 100)
+					if (Resolution_L2_histo_map_[histo_key]->GetEntries() > 100)
 					{
-						Histos_TH1F[histo_key2]->Fit("gaus","+Q","",-10,10);
+						Resolution_L2_histo_map_[histo_key]->Fit("gaus","+Q","",-10,10);
 
-						if (Histos_TH1F[histo_key2]->GetFunction("gaus")!= NULL)
+						if (Resolution_L2_histo_map_[histo_key]->GetFunction("gaus")!= NULL)
 						{
 
-							double ResL2_mean = Histos_TH1F[histo_key2]->GetFunction("gaus")->GetParameter(1);
-							double ResL2_sigma = Histos_TH1F[histo_key2]->GetFunction("gaus")->GetParameter(2);
-							Histos_TH1F[histo_key2]->Fit("gaus","","",ResL2_mean-(2.2*ResL2_sigma),ResL2_mean+(2.2*ResL2_sigma));
-							ResL2_sigma = Histos_TH1F[histo_key2]->GetFunction("gaus")->GetParameter(2);
-							double Exp_sigma =  Histos_TH1F[histo_key2]-> GetMean();
+							double ResL2_mean = Resolution_L2_histo_map_[histo_key]->GetFunction("gaus")->GetParameter(1);
+							double ResL2_sigma = Resolution_L2_histo_map_[histo_key]->GetFunction("gaus")->GetParameter(2);
+							Resolution_L2_histo_map_[histo_key]->Fit("gaus","","",ResL2_mean-(2.2*ResL2_sigma),ResL2_mean+(2.2*ResL2_sigma));
+							ResL2_sigma = Resolution_L2_histo_map_[histo_key]->GetFunction("gaus")->GetParameter(2);
+							double Exp_sigma =  TrkExpectedRes_L2_histo_map_[histo_key]-> GetMean();
 							Resolution_L2_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, ResL2_sigma);
 
 							if (ResL2_sigma > Exp_sigma)
 							{
 
 								ImprouvedRes_L2_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, pow(pow(ResL2_sigma,2)-pow(Exp_sigma,2),0.5));
-								Resolution_L2_map_[chk] = pow(pow(ResL2_sigma,2)-pow(Exp_sigma,2),0.5);
+								Resolution_L2_map_[histo_key] = pow(pow(ResL2_sigma,2)-pow(Exp_sigma,2),0.5);
 							}
 							else
 							{
 								ImprouvedRes_L2_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, 0.05);
-								Resolution_L2_map_[chk] = 0.05;
+								Resolution_L2_map_[histo_key] = 0.05;
 							}
 						}
 						else
 						{
 							Resolution_L2_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, 0);
-							Resolution_L2_map_[chk] = 0.400;
+							Resolution_L2_map_[histo_key] = 0.400;
 						}
 					}
 				}
 
-				chk=ChannelKey(sec_id,pl_id,ch_id);
-        histo_key2=MapKey("Resolution_L2_3p_histo_map_",-1,sec_id,pl_id,ch_id);
-
-				if (Histos_TH1F.find(histo_key2)!=Histos_TH1F.end())
+				if (Resolution_L2_3p_histo_map_.find(histo_key)!=Resolution_L2_3p_histo_map_.end())
 				{
-					if (Histos_TH1F[histo_key2]->GetEntries() > 100)
+					if (Resolution_L2_3p_histo_map_[histo_key]->GetEntries() > 100)
 					{
-						Histos_TH1F[histo_key2]->Fit("gaus","+Q","",-10,10);
+						Resolution_L2_3p_histo_map_[histo_key]->Fit("gaus","+Q","",-10,10);
 
-						if (Histos_TH1F[histo_key2]->GetFunction("gaus")!= NULL)
+						if (Resolution_L2_3p_histo_map_[histo_key]->GetFunction("gaus")!= NULL)
 						{
-							double ResL2_3p_mean = Histos_TH1F[histo_key2]->GetFunction("gaus")->GetParameter(1);
-							double ResL2_3p_sigma = Histos_TH1F[histo_key2]->GetFunction("gaus")->GetParameter(2);
-							Histos_TH1F[histo_key2]->Fit("gaus","","",ResL2_3p_mean-(2.2*ResL2_3p_sigma),ResL2_3p_mean+(2.2*ResL2_3p_sigma));
-							ResL2_3p_sigma = Histos_TH1F[histo_key2]->GetFunction("gaus")->GetParameter(2);
-							double Exp_sigma =  Histos_TH1F[histo_key2]-> GetMean();
+							double ResL2_3p_mean = Resolution_L2_3p_histo_map_[histo_key]->GetFunction("gaus")->GetParameter(1);
+							double ResL2_3p_sigma = Resolution_L2_3p_histo_map_[histo_key]->GetFunction("gaus")->GetParameter(2);
+							Resolution_L2_3p_histo_map_[histo_key]->Fit("gaus","","",ResL2_3p_mean-(2.2*ResL2_3p_sigma),ResL2_3p_mean+(2.2*ResL2_3p_sigma));
+							ResL2_3p_sigma = Resolution_L2_3p_histo_map_[histo_key]->GetFunction("gaus")->GetParameter(2);
+							double Exp_sigma =  TrkExpectedRes_L2_3p_histo_map_[histo_key]-> GetMean();
 							Resolution_L2_3p_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, ResL2_3p_sigma);
 							if (ResL2_3p_sigma > Exp_sigma)
 							{
 								ImprouvedRes_L2_3p_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, pow(pow(ResL2_3p_sigma,2)-pow(Exp_sigma,2),0.5));
-								Resolution_L2_3p_map_[chk] = pow(pow(ResL2_3p_sigma,2)-pow(Exp_sigma,2),0.5);
+								Resolution_L2_3p_map_[histo_key] = pow(pow(ResL2_3p_sigma,2)-pow(Exp_sigma,2),0.5);
 							}
 							else
 							{
 								ImprouvedRes_L2_3p_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, 0.05);
-								Resolution_L2_3p_map_[chk] = 0.05;
+								Resolution_L2_3p_map_[histo_key] = 0.05;
 							}
 						}
 						else
 						{
 							std::cout << "WARNING: L2_3p resolution fit unseccessfull for sector  " << sec_id <<" plane " << pl_id <<" channel " << ch_id << std::endl;
 							Resolution_L2_3p_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, 0);
-							Resolution_L2_3p_map_[chk] = 0.400;
+							Resolution_L2_3p_map_[histo_key] = 0.400;
 						}
 					}
 				}
