@@ -9,6 +9,7 @@ fi
 
 path=$(realpath $6)
 original_root=$(realpath $7)
+calib_path=$(realpath $2)
 cd $1$"/src"
 if [ $? -ne 0 ]; then
     echo "Wrong CMSSW path or the CMSSW used doesn't contain the Analyzer_code/SimpleAnalyzer package."
@@ -30,7 +31,7 @@ fi
 echo "Compilation completed successfully."
 
 echo "Running timing analysis..."
-cmsRun Analyzer_code/SimpleAnalyzer/test/test.py calibFile=$2 geometryFile=$3 validOOT=$4 debug=$5 outputFile="out.root"
+cmsRun Analyzer_code/SimpleAnalyzer/test/test.py calibFile=$calib_path geometryFile=$3 validOOT=$4 debug=$5 outputFile="out.root"
   if [ $? -ne 0 ]; then
       echo "Error while executing the cmsRun command."
       exit 2
@@ -38,5 +39,4 @@ cmsRun Analyzer_code/SimpleAnalyzer/test/test.py calibFile=$2 geometryFile=$3 va
 echo "Timing analysis done."
 
 echo "Comparsion script output:"
-echo "export PYTHONPATH=/usr/lib64/root" >> ~/.bashrc
 python $path out.root $original_root
