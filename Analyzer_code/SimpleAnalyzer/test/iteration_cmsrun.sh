@@ -28,6 +28,12 @@ if [ $? -ne 0 ]; then
     exit 2
 fi
 
+scram b -j 8
+if [ $? -ne 0 ]; then
+    echo "Compilation errors."
+    exit 2
+fi
+
 for i in $(seq 0 $1)
 do
   echo "Running timing analysis..."

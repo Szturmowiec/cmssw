@@ -174,10 +174,11 @@ class DiamondTimingAnalyzer : public edm::one::EDAnalyzer<edm::one::SharedResour
 	  std::map<ChannelKey, double> Resolution_L2_map_;
 	  std::map<ChannelKey, double> Resolution_L2_3p_map_;
 
-	  std::map<std::pair<int,int>, TGraph*>  Resolution_L2_graph_map_;
+		std::map<std::tuple<std::string,int,int>,TGraph*> L2_res;
+	  /*std::map<std::pair<int,int>, TGraph*>  Resolution_L2_graph_map_;
 	  std::map<std::pair<int,int>, TGraph*>  Resolution_L2_3p_graph_map_;
 	  std::map<std::pair<int,int>, TGraph*>  ImprouvedRes_L2_graph_map_;
-	  std::map<std::pair<int,int>, TGraph*>  ImprouvedRes_L2_3p_graph_map_;
+	  std::map<std::pair<int,int>, TGraph*>  ImprouvedRes_L2_3p_graph_map_;*/
 
 	  TTree  *TCalibration_;
 	  int cal_channel_;
@@ -280,11 +281,8 @@ DiamondTimingAnalyzer::initHistograms(const CTPPSDiamondDetId& detId)
     detId.rpName(dirName, CTPPSDiamondDetId::nPath);
     std::string rpName;
     detId.rpName(rpName, CTPPSDiamondDetId::nFull);
-
     // create directory for the detector, if not already done
     mainDir_map_[ detId.getRPId() ] = fs_->mkdir( dirName );
-
-
 
    }
 
@@ -481,7 +479,6 @@ void planes_res(int planes,DiamondDetectorClass DiamondDet,std::vector<bool> Sec
 		  Tracks_resolution_histo_V_[ sec_number ]->Fill(Track_precision_SPC);
 		  Tracks_time_RAW_histo_V_[ sec_number ]->Fill(Track_time_RAW);
 		}
-
 	        //std::cout << "timing saved" << std::endl;
 
 	  if (planes==3 || (planes==4 && mark_tag))
@@ -557,6 +554,53 @@ void planes_res(int planes,DiamondDetectorClass DiamondDet,std::vector<bool> Sec
 		}
 	}
 
+	void full_track_resolution_L2(std::map<MapKey,TH1F*> &Histos_TH1F,std::map<std::tuple<std::string,int,int>,TGraph*> &L2_res,std::map<ChannelKey, double> &Resolution_L2_map_,
+		ChannelKey chk,std::string res_histo,std::string expected_res_histo,std::string res_graph,int planes){
+			MapKey histo_key2=MapKey(res_histo,-1,chk.sector,chk.plane,chk.channel);
+			std::string improved="ImprouvedRes_L2_graph_map_";
+			if (planes==3){
+				improved="ImprouvedRes_L2_3p_graph_map_";
+				res_histo="Resolution_L2_3p_map_";
+			}
+
+			if (Histos_TH1F.find(histo_key2)!=Histos_TH1F.end())
+			{
+				if (Histos_TH1F[histo_key2]->GetEntries() > 100)
+				{
+					Histos_TH1F[histo_key2]->Fit("gaus","+Q","",-10,10);
+
+					if (Histos_TH1F[histo_key2]->GetFunction("gaus")!= NULL)
+					{
+
+						double ResL2_mean = Histos_TH1F[histo_key2]->GetFunction("gaus")->GetParameter(1);
+						double ResL2_sigma = Histos_TH1F[histo_key2]->GetFunction("gaus")->GetParameter(2);
+						Histos_TH1F[histo_key2]->Fit("gaus","","",ResL2_mean-(2.2*ResL2_sigma),ResL2_mean+(2.2*ResL2_sigma));
+						ResL2_sigma = Histos_TH1F[histo_key2]->GetFunction("gaus")->GetParameter(2);
+						double Exp_sigma =  Histos_TH1F[MapKey(expected_res_histo,-1,chk.sector,chk.plane,chk.channel)]-> GetMean();
+						L2_res[ std::make_tuple(res_graph,chk.sector,chk.plane)]->SetPoint(chk.channel+1, chk.channel, ResL2_sigma);
+
+						if (ResL2_sigma > Exp_sigma)
+						{
+
+							L2_res[ std::make_tuple(improved,chk.sector,chk.plane)]->SetPoint(chk.channel+1, chk.channel, pow(pow(ResL2_sigma,2)-pow(Exp_sigma,2),0.5));
+							Resolution_L2_map_[chk] = pow(pow(ResL2_sigma,2)-pow(Exp_sigma,2),0.5);
+						}
+						else
+						{
+							L2_res[ std::make_tuple(improved,chk.sector,chk.plane)]->SetPoint(chk.channel+1, chk.channel, 0.05);
+							Resolution_L2_map_[chk] = 0.05;
+						}
+					}
+					else
+					{
+						L2_res[ std::make_tuple(res_graph,chk.sector,chk.plane)]->SetPoint(chk.channel+1, chk.channel, 0);
+						Resolution_L2_map_[chk] = 0.400;
+					}
+				}
+			}
+	}
+
+
 // ------------ method called for each event  ------------
 void
 DiamondTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
@@ -568,22 +612,15 @@ DiamondTimingAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   //iEvent.getByToken( tokenDigi_, timingDigi );
   iEvent.getByToken( tokenRecHit_, timingRecHit );
   iEvent.getByToken( tokenPixelLocalTrack_, pixelLocalTrack );
-
-
-
-
-
 //*run_ = iEvent.id().run();
 //*ev_ = iEvent.id().event();
 //*lumiblock_ = iEvent.luminosityBlock();
-
 
  ////////////////////////////////////////////////////////////////
 //
 //		EXTRACT PIXELS TRACK NUMBER
 //
 /////////////////////////////////////////////////////////////////
-
 
   Pixel_Mux_map_.clear();
 
@@ -1031,25 +1068,21 @@ DiamondTimingAnalyzer::beginJob()
 
 			std::string Hname = "Valid TOT mean sector "+std::to_string(sec_number)+" plane "+std::to_string(pl_number);
 
-
-			Resolution_L2_graph_map_[ std::make_pair(sec_number,pl_number)] = dir_cyl_L2Res_V[sec_number][pl_number].make<TGraph>(12);
+			L2_res[ std::make_tuple("Resolution_L2_graph_map_",sec_number,pl_number)] = dir_cyl_L2Res_V[sec_number][pl_number].make<TGraph>(12);
 			Hname="L2 resolution sector "+std::to_string(sec_number)+" plane "+std::to_string(pl_number);
-			Resolution_L2_graph_map_[ std::make_pair(sec_number,pl_number)]  -> SetNameTitle(Hname.c_str(),Hname.c_str());
+			L2_res[ std::make_tuple("Resolution_L2_graph_map_",sec_number,pl_number)]-> SetNameTitle(Hname.c_str(),Hname.c_str());
 
-			Resolution_L2_3p_graph_map_[ std::make_pair(sec_number,pl_number)] = dir_cyl_L2_3p_Res_V[sec_number][pl_number].make<TGraph>(12);
+			L2_res[ std::make_tuple("Resolution_L2_3p_graph_map_",sec_number,pl_number)] = dir_cyl_L2_3p_Res_V[sec_number][pl_number].make<TGraph>(12);
 			Hname="L2_3p resolution sector "+std::to_string(sec_number)+" plane "+std::to_string(pl_number);
-			Resolution_L2_3p_graph_map_[ std::make_pair(sec_number,pl_number)]  -> SetNameTitle(Hname.c_str(),Hname.c_str());
+			L2_res[ std::make_tuple("Resolution_L2_3p_graph_map_",sec_number,pl_number)]  -> SetNameTitle(Hname.c_str(),Hname.c_str());
 
-
-			ImprouvedRes_L2_3p_graph_map_[ std::make_pair(sec_number,pl_number)] = dir_cyl_L2_3p_Res_V[sec_number][pl_number].make<TGraph>(12);
+			L2_res[ std::make_tuple("ImprouvedRes_L2_3p_graph_map_",sec_number,pl_number)] = dir_cyl_L2_3p_Res_V[sec_number][pl_number].make<TGraph>(12);
 			Hname="Improuved L2_3p resolution sector "+std::to_string(sec_number)+" plane "+std::to_string(pl_number);
-			ImprouvedRes_L2_3p_graph_map_[ std::make_pair(sec_number,pl_number)]  -> SetNameTitle(Hname.c_str(),Hname.c_str());
+			L2_res[ std::make_tuple("ImprouvedRes_L2_3p_graph_map_",sec_number,pl_number)]  -> SetNameTitle(Hname.c_str(),Hname.c_str());
 
-
-			ImprouvedRes_L2_graph_map_[ std::make_pair(sec_number,pl_number)] = dir_cyl_L2Res_V[sec_number][pl_number].make<TGraph>(12);
+			L2_res[ std::make_tuple("ImprouvedRes_L2_graph_map_",sec_number,pl_number)] = dir_cyl_L2Res_V[sec_number][pl_number].make<TGraph>(12);
 			Hname="Improuved L2 resolution sector "+std::to_string(sec_number)+" plane "+std::to_string(pl_number);
-			ImprouvedRes_L2_graph_map_[ std::make_pair(sec_number,pl_number)]  -> SetNameTitle(Hname.c_str(),Hname.c_str());
-
+			L2_res[ std::make_tuple("ImprouvedRes_L2_graph_map_",sec_number,pl_number)] -> SetNameTitle(Hname.c_str(),Hname.c_str());
 
 			for (int pl_number_2 = pl_number+1; pl_number_2 < PLANES_X_DETECTOR; pl_number_2++)
 			{
@@ -1347,8 +1380,10 @@ DiamondTimingAnalyzer::endJob()
 		{
 			for (int ch_id=0; ch_id < CHANNELS_X_PLANE; ch_id ++)
 			{
-
-				ChannelKey chk(sec_id,pl_id,ch_id);
+				ChannelKey chk=ChannelKey(sec_id,pl_id,ch_id);
+				full_track_resolution_L2(Histos_TH1F,L2_res,Resolution_L2_map_,chk,"Resolution_L2_histo_map_","TrkExpectedRes_L2_histo_map_","Resolution_L2_3p_graph_map_",4);
+				//full_track_resolution_L2(Histos_TH1F,L2_res,Resolution_L2_map_,chk,"Resolution_L2_3p_histo_map_","TrkExpectedRes_L2_3p_histo_map_","Resolution_L2_3p_graph_map_",3);
+				/*ChannelKey chk(sec_id,pl_id,ch_id);
         MapKey histo_key2=MapKey("Resolution_L2_histo_map_",-1,sec_id,pl_id,ch_id);
 
 				if (Histos_TH1F.find(histo_key2)!=Histos_TH1F.end())
@@ -1365,30 +1400,30 @@ DiamondTimingAnalyzer::endJob()
 							Histos_TH1F[histo_key2]->Fit("gaus","","",ResL2_mean-(2.2*ResL2_sigma),ResL2_mean+(2.2*ResL2_sigma));
 							ResL2_sigma = Histos_TH1F[histo_key2]->GetFunction("gaus")->GetParameter(2);
 							double Exp_sigma =  Histos_TH1F[MapKey("TrkExpectedRes_L2_histo_map_",-1,sec_id,pl_id,ch_id)]-> GetMean();
-							Resolution_L2_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, ResL2_sigma);
+							L2_res[ std::make_tuple("Resolution_L2_graph_map_",sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, ResL2_sigma);
 
 							if (ResL2_sigma > Exp_sigma)
 							{
 
-								ImprouvedRes_L2_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, pow(pow(ResL2_sigma,2)-pow(Exp_sigma,2),0.5));
+								L2_res[ std::make_tuple("ImprouvedRes_L2_graph_map_",sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, pow(pow(ResL2_sigma,2)-pow(Exp_sigma,2),0.5));
 								Resolution_L2_map_[chk] = pow(pow(ResL2_sigma,2)-pow(Exp_sigma,2),0.5);
 							}
 							else
 							{
-								ImprouvedRes_L2_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, 0.05);
+								L2_res[ std::make_tuple("ImprouvedRes_L2_graph_map_",sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, 0.05);
 								Resolution_L2_map_[chk] = 0.05;
 							}
 						}
 						else
 						{
-							Resolution_L2_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, 0);
+							L2_res[ std::make_tuple("Resolution_L2_graph_map_",sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, 0);
 							Resolution_L2_map_[chk] = 0.400;
 						}
 					}
 				}
 
 				chk=ChannelKey(sec_id,pl_id,ch_id);
-        histo_key2=MapKey("Resolution_L2_3p_histo_map_",-1,sec_id,pl_id,ch_id);
+        MapKey histo_key2=MapKey("Resolution_L2_3p_histo_map_",-1,sec_id,pl_id,ch_id);
 
 				if (Histos_TH1F.find(histo_key2)!=Histos_TH1F.end())
 				{
@@ -1403,26 +1438,26 @@ DiamondTimingAnalyzer::endJob()
 							Histos_TH1F[histo_key2]->Fit("gaus","","",ResL2_3p_mean-(2.2*ResL2_3p_sigma),ResL2_3p_mean+(2.2*ResL2_3p_sigma));
 							ResL2_3p_sigma = Histos_TH1F[histo_key2]->GetFunction("gaus")->GetParameter(2);
 							double Exp_sigma =  Histos_TH1F[MapKey("TrkExpectedRes_L2_3p_histo_map_",-1,sec_id,pl_id,ch_id)]-> GetMean();
-							Resolution_L2_3p_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, ResL2_3p_sigma);
+							L2_res[ std::make_tuple("Resolution_L2_3p_graph_map_",sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, ResL2_3p_sigma);
 							if (ResL2_3p_sigma > Exp_sigma)
 							{
-								ImprouvedRes_L2_3p_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, pow(pow(ResL2_3p_sigma,2)-pow(Exp_sigma,2),0.5));
+								L2_res[ std::make_tuple("ImprouvedRes_L2_3p_graph_map_",sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, pow(pow(ResL2_3p_sigma,2)-pow(Exp_sigma,2),0.5));
 								Resolution_L2_3p_map_[chk] = pow(pow(ResL2_3p_sigma,2)-pow(Exp_sigma,2),0.5);
 							}
 							else
 							{
-								ImprouvedRes_L2_3p_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, 0.05);
+								L2_res[ std::make_tuple("ImprouvedRes_L2_3p_graph_map_",sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, 0.05);
 								Resolution_L2_3p_map_[chk] = 0.05;
 							}
 						}
 						else
 						{
 							std::cout << "WARNING: L2_3p resolution fit unseccessfull for sector  " << sec_id <<" plane " << pl_id <<" channel " << ch_id << std::endl;
-							Resolution_L2_3p_graph_map_[std::make_pair(sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, 0);
+							L2_res[ std::make_tuple("Resolution_L2_3p_graph_map_",sec_id,pl_id)]->SetPoint(ch_id+1, ch_id, 0);
 							Resolution_L2_3p_map_[chk] = 0.400;
 						}
 					}
-				}
+				}*/
 			}
 
 		}
@@ -1449,7 +1484,6 @@ DiamondTimingAnalyzer::endJob()
 
 
 			TF1 *myfermi = new TF1("MYfit","[0]/(exp((x-[1])/[2])+1)+[3]",10.5,25);
-			//myfermi-> SetParameters(1.5,12.5,1,4);
 			myfermi-> SetParameters(3*Histos_TH1F[MapKey("VALID_RAW_T_Distribution_",-1,recHitKey.sector,recHitKey.plane,recHitKey.channel)]->GetRMS(),
 									Histos_TH1F[MapKey("ValidTOT_Distribution_",-1,recHitKey.sector,recHitKey.plane,recHitKey.channel)]->GetMean(),
 									0.8,
@@ -1467,20 +1501,6 @@ DiamondTimingAnalyzer::endJob()
 										<< std::endl;
 
 			TOTvsT_Profile_map_[ recHitKey ]->Fit(myfermi,"B+","",10.4,Fit_UpRange);
-
-			//secondary fit
-			/*TF1 *mygaus = new TF1("MYgaus","[3]-gaus",9.5,25);
-			mygaus-> SetParameters(3*ValidT_Histo_map_[recHitKey]->GetRMS(),
-									ValidTOT_Histo_map_[recHitKey]->GetMean()+ ValidTOT_Histo_map_[recHitKey]->GetRMS(),
-									1.3,
-									ValidT_Histo_map_[recHitKey]->GetMean()+ValidT_Histo_map_[recHitKey]->GetRMS());
-			TOTvsT_Profile_map_[ recHitKey ]->Fit(mygaus,"B+","",9.5,Fit_UpRange);
-
-			std::cout << "starting parameters gaus: " << 3*ValidT_Histo_map_[recHitKey]->GetRMS()
-										<< " ; " << ValidTOT_Histo_map_[recHitKey]->GetMean()+ ValidTOT_Histo_map_[recHitKey]->GetRMS()
-										<< " ; " << 1.3
-										<< " ; " << ValidT_Histo_map_[recHitKey]->GetMean()+ValidT_Histo_map_[recHitKey]->GetRMS()
-										<< std::endl;*/
 
 			cal_sector_    = recHitKey.sector;
 			cal_plane_  = recHitKey.plane;
