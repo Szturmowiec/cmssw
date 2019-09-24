@@ -15,7 +15,8 @@ process.verbosity = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-    '/store/group/dpg_ctpps/comm_ctpps/CalibrationDevel/10B9DB48-1EB4-E811-956C-FA163ECAADB8.root'
+    ''
+    #'/store/group/dpg_ctpps/comm_ctpps/CalibrationDevel/10B9DB48-1EB4-E811-956C-FA163ECAADB8.root'
 #'/store/data/Run2018D/ZeroBias/RAW/v1/000/322/332/00000/FE86FF5E-99B1-E811-B512-FA163EBBBA60.root',
 #'/store/data/Run2018D/ZeroBias/RAW/v1/000/322/332/00000/FE4DDC18-87B1-E811-BA58-FA163E7F2CAB.root',
 #'/store/data/Run2018D/ZeroBias/RAW/v1/000/322/332/00000/FCC303F6-7CB1-E811-8D9D-FA163ECA48A6.root',
@@ -115,8 +116,8 @@ process.out = cms.OutputModule("PoolOutputModule",
 )
 
 process.path = cms.Path(
-    #process.ctppsRawToDigi *
-    #process.recoCTPPS *
+    process.ctppsRawToDigi *
+    process.recoCTPPS *
     process.DiamondTimingProducer
 )
 
