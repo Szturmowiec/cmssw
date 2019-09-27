@@ -399,7 +399,7 @@ void planes_res(int planes,DiamondDetectorClass DiamondDet,std::vector<bool> Sec
 		if (planes==3){
 		  if (sec_number==0)
 		  {
-		    active_pl_map[0]=0;
+		    active_pl_map[0]=1;
 		    active_pl_map[1]=1;
 		    active_pl_map[2]=1;
 		    active_pl_map[3]=1;
@@ -409,7 +409,7 @@ void planes_res(int planes,DiamondDetectorClass DiamondDet,std::vector<bool> Sec
 		    active_pl_map[0]=1;
 		    active_pl_map[1]=1;
 		    active_pl_map[2]=1;
-		    active_pl_map[3]=0;
+		    active_pl_map[3]=1;
 		  }
 		}
 
@@ -503,9 +503,11 @@ void planes_res(int planes,DiamondDetectorClass DiamondDet,std::vector<bool> Sec
 	      for (int pl_loop = 0 ; pl_loop < planes_x_detector; pl_loop++)
 	      {
 					if (planes==3 && active_pl_map[pl_loop] ==0) continue;
+					if (hit_selected[pl_loop].sector==-1 || hit_selected[pl_loop].station==-1 || hit_selected[pl_loop].plane==-1 || hit_selected[pl_loop].channel==-1) continue;
 
 	        if (pl_loop == pl_mark)
 	        {
+
 	          Marked_hit_time= DiamondDet.GetTime_SPC(hit_selected[pl_loop].sector,hit_selected[pl_loop].station,hit_selected[pl_loop].plane,hit_selected[pl_loop].channel);
 	          Marked_hit_channel = hit_selected[pl_loop].channel;
 	          continue;
@@ -513,7 +515,6 @@ void planes_res(int planes,DiamondDetectorClass DiamondDet,std::vector<bool> Sec
 	        double Others_hit_time= DiamondDet.GetTime_SPC(hit_selected[pl_loop].sector,hit_selected[pl_loop].station,hit_selected[pl_loop].plane,hit_selected[pl_loop].channel);
 	        double Others_hit_prec= DiamondDet.GetPadPrecision(hit_selected[pl_loop].sector,hit_selected[pl_loop].station,hit_selected[pl_loop].plane,hit_selected[pl_loop].channel);
 	        double Others_hit_weig= DiamondDet.GetPadWeight(hit_selected[pl_loop].sector,hit_selected[pl_loop].station,hit_selected[pl_loop].plane,hit_selected[pl_loop].channel);
-
 	        if (hit_iter == LocalTrack_mapIter.second.begin())
 	        {
 
@@ -556,7 +557,6 @@ void planes_res(int planes,DiamondDetectorClass DiamondDet,std::vector<bool> Sec
 	      Histos_TH1F[MapKey(std::get<1>(names_histos_L2_1[0]),st_number,sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_hit_difference);
 	      Histos_TH1F[MapKey(std::get<1>(names_histos_L2_1[1]),st_number,sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_track_time);
 	      Histos_TH1F[MapKey(std::get<1>(names_histos_L2_1[2]),st_number,sec_number,pl_mark,Marked_hit_channel)]-> Fill(Marked_track_precision);
-
 	    	}
 	  	}
 		}
@@ -755,6 +755,7 @@ for (int sec_number=0; sec_number < MAX_SECTOR_NUMBER; sec_number++)
 		for  (int pl_number_2 = pl_number+1; pl_number_2 < PLANES_X_DETECTOR; pl_number_2++)
 
 		{
+
 			//multiplicity corralation between planes (all hits)
 			TimingCorrelation_mux_Hmap_V_[sec_number][st_number][ std::make_pair(pl_number,pl_number_2) ]->Fill(DiamondDet.GetMux(sec_number,st_number,pl_number),DiamondDet.GetMux(sec_number,st_number,pl_number_2));
 		}
@@ -784,6 +785,7 @@ for (int sec_number=0; sec_number < MAX_SECTOR_NUMBER; sec_number++)
 
 	if (DiamondDet.SecIsSaturated(sec_number))
 	{
+
 		for (int st_number=1; st_number<MAX_STATION_NUMBER+1; st_number++)
 		{
 		for  (int pl_number=0; pl_number < PLANES_X_DETECTOR; pl_number++)
@@ -841,6 +843,7 @@ for (int sec_number=0; sec_number < MAX_SECTOR_NUMBER; sec_number++)
 
 	for  (int ch_number=0; ch_number < CHANNELS_X_PLANE; ch_number++)
 	{
+
 		if (DiamondDet.PairActive(sec_number, st_number,PLANE_2_ID,ch_number,PLANE_3_ID,ch_number))
 		{
 			Histos_TH1F[MapKey("Raw_DT_Hmap_",st_number,sec_number,-1,ch_number)]->Fill(DiamondDet.GetTime(sec_number,st_number,PLANE_2_ID,ch_number)-DiamondDet.GetTime(sec_number,st_number,PLANE_3_ID,ch_number));
@@ -873,40 +876,45 @@ for (const auto& LocalTrack_mapIter : DiamondDet.GetDiamondTrack_map()) // loop 
 	if	(LocalTrack_mapIter.second.size() < 2) continue;
 	for (hitA_iter=LocalTrack_mapIter.second.begin();hitA_iter < LocalTrack_mapIter.second.end()-1; hitA_iter++ ) // hits in track loop LocalTrack_mapIter.second = std::vector<std::pair<ChannelKey,CTPPSDiamondRecHit> >
 	{
+
 		for (hitB_iter=hitA_iter+1; hitB_iter < LocalTrack_mapIter.second.end(); hitB_iter++ ) // hits in track loop LocalTrack_mapIter.second = std::vector<std::pair<ChannelKey,CTPPSDiamondRecHit> >
 		{
 			if ((*hitA_iter).first.plane == (*hitB_iter).first.plane) continue;
 			if((*hitA_iter).first.sector != (*hitB_iter).first.sector)  std::cout << "WARNING: hits from different sectors in same tracks!!" << std::endl;
-			if (Raw_DT_TrackedPlane_Hmap_.find(std::make_pair((*hitA_iter).first, (*hitB_iter).first))==Raw_DT_TrackedPlane_Hmap_.end()) // creta pair histos if do not exist
+			ChannelKey chkA=*new ChannelKey((*hitA_iter).first.sector,st_number,(*hitA_iter).first.plane,(*hitA_iter).first.channel);
+			ChannelKey chkB=*new ChannelKey((*hitB_iter).first.sector,st_number,(*hitB_iter).first.plane,(*hitB_iter).first.channel);
+
+			if (Raw_DT_TrackedPlane_Hmap_.find(std::make_pair(chkA, chkB))==Raw_DT_TrackedPlane_Hmap_.end()) // creta pair histos if do not exist
 			{
-				std::string Histo_name = "Raw_resolution_TP_sec_"+std::to_string(sec_number)+"_station_"+std::to_string(st_number)+"_planes_"+std::to_string((*hitA_iter).first.plane)+"_"+std::to_string((*hitB_iter).first.plane)+
-					"_channels_"+std::to_string((*hitA_iter).first.channel)+"_"+std::to_string((*hitB_iter).first.channel);
-				Raw_DT_TrackedPlane_Hmap_[std::make_pair((*hitA_iter).first, (*hitB_iter).first)] =
-					dir_cyl_TPTI_V[sec_number][st_number-1][std::make_pair((*hitA_iter).first.plane,(*hitB_iter).first.plane)].make<TH1F>(Histo_name.c_str(), Histo_name.c_str(), 1200, -60, 60 );
 
-				Histo_name = "SPC_resolution_TP_sec_"+std::to_string(sec_number)+"_station_"+std::to_string(st_number)+"_planes_"+std::to_string((*hitA_iter).first.plane)+"_"+std::to_string((*hitB_iter).first.plane)+
-					"_channels_"+std::to_string((*hitA_iter).first.channel)+"_"+std::to_string((*hitB_iter).first.channel);
-				SPC_DT_TrackedPlane_Hmap_[std::make_pair((*hitA_iter).first, (*hitB_iter).first)] =
-					dir_cyl_TPTI_V[sec_number][st_number-1][std::make_pair((*hitA_iter).first.plane,(*hitB_iter).first.plane)].make<TH1F>(Histo_name.c_str(), Histo_name.c_str(), 1200, -60, 60 );
+				std::string Histo_name = "Raw_resolution_TP_sec_"+std::to_string(sec_number)+"_station_"+std::to_string(st_number)+"_planes_"+std::to_string(chkA.plane)+"_"+std::to_string(chkB.plane)+
+					"_channels_"+std::to_string(chkA.channel)+"_"+std::to_string(chkB.channel);
+				Raw_DT_TrackedPlane_Hmap_[std::make_pair(chkA, chkB)] =
+					dir_cyl_TPTI_V[sec_number][st_number-1][std::make_pair(chkA.plane,chkB.plane)].make<TH1F>(Histo_name.c_str(), Histo_name.c_str(), 1200, -60, 60 );
 
-				Histo_name = "TOT_vs_TOT_TP_sector_"+std::to_string(sec_number)+"_station_"+std::to_string(st_number)+"_planes_"+std::to_string((*hitA_iter).first.plane)+"_"+std::to_string((*hitB_iter).first.plane)+
-					"_channels_"+std::to_string((*hitA_iter).first.channel)+"_"+std::to_string((*hitB_iter).first.channel);
-				ToT_vs_ToT_TrackedPlane_Hmap_[std::make_pair((*hitA_iter).first, (*hitB_iter).first)] =
-						dir_cyl_TPTI_V[sec_number][st_number-1][std::make_pair((*hitA_iter).first.plane,(*hitB_iter).first.plane)].make<TH2F>(Histo_name.c_str(), Histo_name.c_str(), 100, 5, 25, 100, 5, 25 );
+				Histo_name = "SPC_resolution_TP_sec_"+std::to_string(sec_number)+"_station_"+std::to_string(st_number)+"_planes_"+std::to_string(chkA.plane)+"_"+std::to_string(chkB.plane)+
+					"_channels_"+std::to_string(chkA.channel)+"_"+std::to_string(chkB.channel);
+				SPC_DT_TrackedPlane_Hmap_[std::make_pair(chkA, chkB)] =
+					dir_cyl_TPTI_V[sec_number][st_number-1][std::make_pair(chkA.plane,chkB.plane)].make<TH1F>(Histo_name.c_str(), Histo_name.c_str(), 1200, -60, 60 );
+
+				Histo_name = "TOT_vs_TOT_TP_sector_"+std::to_string(sec_number)+"_station_"+std::to_string(st_number)+"_planes_"+std::to_string(chkA.plane)+"_"+std::to_string(chkB.plane)+
+					"_channels_"+std::to_string(chkA.channel)+"_"+std::to_string(chkB.channel);
+				ToT_vs_ToT_TrackedPlane_Hmap_[std::make_pair(chkA, chkB)] =
+						dir_cyl_TPTI_V[sec_number][st_number-1][std::make_pair(chkA.plane,chkB.plane)].make<TH2F>(Histo_name.c_str(), Histo_name.c_str(), 100, 5, 25, 100, 5, 25 );
 
 			}
 
 
-			Raw_DT_TrackedPlane_Hmap_[std::make_pair((*hitA_iter).first, (*hitB_iter).first)]->
-				Fill(DiamondDet.GetTime((*hitA_iter).first.sector,(*hitA_iter).first.station,(*hitA_iter).first.plane,(*hitA_iter).first.channel)-DiamondDet.GetTime((*hitB_iter).first.sector,(*hitB_iter).first.station,(*hitB_iter).first.plane,(*hitB_iter).first.channel));
+			Raw_DT_TrackedPlane_Hmap_[std::make_pair(chkA, chkB)]->
+				Fill(DiamondDet.GetTime(chkA.sector,(*hitA_iter).first.station,chkA.plane,chkA.channel)-DiamondDet.GetTime(chkB.sector,(*hitB_iter).first.station,chkB.plane,chkB.channel));
 
-			double TimeA_corr=DiamondDet.GetTime_SPC((*hitA_iter).first.sector,(*hitA_iter).first.station,(*hitA_iter).first.plane,(*hitA_iter).first.channel);
-			double TimeB_corr=DiamondDet.GetTime_SPC((*hitB_iter).first.sector,(*hitB_iter).first.station,(*hitB_iter).first.plane,(*hitB_iter).first.channel);
+			double TimeA_corr=DiamondDet.GetTime_SPC(chkA.sector,(*hitA_iter).first.station,chkA.plane,chkA.channel);
+			double TimeB_corr=DiamondDet.GetTime_SPC(chkB.sector,(*hitB_iter).first.station,chkB.plane,chkB.channel);
 
-			SPC_DT_TrackedPlane_Hmap_[std::make_pair((*hitA_iter).first, (*hitB_iter).first)]->Fill(TimeA_corr-TimeB_corr);
-			ToT_vs_ToT_TrackedPlane_Hmap_[std::make_pair((*hitA_iter).first, (*hitB_iter).first)]->
-				Fill(DiamondDet.GetToT((*hitA_iter).first.sector,(*hitA_iter).first.station,(*hitA_iter).first.plane,(*hitA_iter).first.channel),DiamondDet.GetToT((*hitB_iter).first.sector,(*hitB_iter).first.station,(*hitB_iter).first.plane,(*hitB_iter).first.channel));
-			Correlation_TP_V_[sec_number][st_number][std::make_pair((*hitA_iter).first.plane,(*hitB_iter).first.plane)] ->Fill((*hitA_iter).first.channel, (*hitB_iter).first.channel);
+			SPC_DT_TrackedPlane_Hmap_[std::make_pair(chkA, chkB)]->Fill(TimeA_corr-TimeB_corr);
+			ToT_vs_ToT_TrackedPlane_Hmap_[std::make_pair(chkA, chkB)]->
+				Fill(DiamondDet.GetToT(chkA.sector,(*hitA_iter).first.station,chkA.plane,chkA.channel),DiamondDet.GetToT(chkB.sector,(*hitB_iter).first.station,chkB.plane,chkB.channel));
+			Correlation_TP_V_[sec_number][st_number][std::make_pair(chkA.plane,chkB.plane)] ->Fill(chkA.channel, chkB.channel);
 
 		}
 
@@ -941,6 +949,7 @@ planes_res(4,DiamondDet,Sector_TBA,dir_cyl_L2Res_V,Histos_TH1F,PLANES_X_DETECTOR
 
 planes_res(3,DiamondDet,Sector_TBA,dir_cyl_L2_3p_Res_V,Histos_TH1F,PLANES_X_DETECTOR,MAX_STATION_NUMBER,Tracks_time_RAW_histo_V_,Tracks_time_SPC_histo_V_,Tracks_resolution_histo_V_);
 //std::cout << "end new block" << std::endl;
+
 }
 
 
@@ -965,7 +974,7 @@ DiamondTimingAnalyzer::beginJob()
 		dir_plane_VV[i].resize(MAX_STATION_NUMBER);
 	}
 
-	std::pair<std::string,std::string> station_names[]={std::make_pair("station 220cyl","cyl_hr"),std::make_pair("station 220","near_bt")};
+	std::pair<std::string,std::string> station_names[]={std::make_pair("station 220cyl","cyl_hr"),std::make_pair("station 220","nr_hr")};
   std::string sector_names[]={"sector 45","sector 56"};
   std::string plane_names_1[]={"plane0_1","plane0_2","plane0_3","plane1_2","plane1_3","plane2_3"};
    // edm::Service<TFileService> fs_;

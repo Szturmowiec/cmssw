@@ -80,6 +80,8 @@ process.DiamondTimingAnalyzer = cms.EDAnalyzer('DiamondTimingAnalyzer',
  debug = cms.int32(options.debug),
 )
 
+process.ctppsDiamondRecHits.applyCalibration = False
+
 process.DiamondTimingProducer = cms.EDProducer('DiamondTimingProducer',
     #tagDigi = cms.InputTag("ctppsDiamondRawToDigi", "TimingDiamond"),
     #tagLocalTrack = cms.InputTag("ctppsDiamondLocalTracks"),

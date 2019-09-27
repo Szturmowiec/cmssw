@@ -15,7 +15,17 @@ process.verbosity = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-    ''
+'/store/data/Run2018D/ZeroBias/RAW/v1/000/324/021/00000/CED9C85E-7F4B-C545-BACC-9ECF0459EC04.root',
+'/store/data/Run2018D/ZeroBias/RAW/v1/000/324/021/00000/47B83E15-4E53-A546-B34B-9708D5A2CDC6.root',
+'/store/data/Run2018D/ZeroBias/RAW/v1/000/324/021/00000/2C1FD412-7B58-B449-922B-DA0A4CC66E02.root',
+'/store/data/Run2018D/ZeroBias/RAW/v1/000/324/021/00000/8A77F857-0022-FE4B-BD3E-1382A082868F.root'
+#'/store/data/Run2018D/ZeroBias/RAW/v1/000/324/021/00000/7665DF69-4838-4447-A55E-C7714303E359.root',
+#'/store/data/Run2018D/ZeroBias/RAW/v1/000/324/021/00000/619587B5-B7F1-414E-A9D1-BDE9DC1397E2.root',
+#'/store/data/Run2018D/ZeroBias/RAW/v1/000/324/021/00000/22B32972-F03B-E048-896B-C9FDC035F850.root',
+#'/store/data/Run2018D/ZeroBias/RAW/v1/000/324/021/00000/54D65CF5-D04B-6B46-A058-4CDBE28FAAD0.root',
+#'/store/data/Run2018D/ZeroBias/RAW/v1/000/324/021/00000/2A637F3F-212E-EB40-898F-299E5345CEE7.root',
+#'/store/data/Run2018D/ZeroBias/RAW/v1/000/324/021/00000/AF7CEED2-CAAE-B54B-9CA9-5F605CFCCB3E.root',
+#'/store/data/Run2018D/ZeroBias/RAW/v1/000/324/021/00000/50A2EC60-3F07-6844-8C52-4ED8114C0420.root'
     #'/store/group/dpg_ctpps/comm_ctpps/CalibrationDevel/10B9DB48-1EB4-E811-956C-FA163ECAADB8.root'
 #'/store/data/Run2018D/ZeroBias/RAW/v1/000/322/332/00000/FE86FF5E-99B1-E811-B512-FA163EBBBA60.root',
 #'/store/data/Run2018D/ZeroBias/RAW/v1/000/322/332/00000/FE4DDC18-87B1-E811-BA58-FA163E7F2CAB.root',
@@ -93,8 +103,19 @@ process.load("EventFilter.CTPPSRawToDigi.ctppsRawToDigi_cff")
 
 # local RP reconstruction chain with standard settings
 process.load("RecoCTPPS.Configuration.recoCTPPS_cff")
-
-
+process.totemDAQMappingESSourceXML_TimingDiamond = cms.ESSource("TotemDAQMappingESSourceXML",
+           verbosity = cms.untracked.uint32(0),
+           subSystem = cms.untracked.string("TimingDiamond"),
+           configuration = cms.VPSet(
+                 cms.PSet(
+                         validityRange=cms.EventRange("1:min -999999999:max"),
+                         mappingFileNames=cms.vstring("CondFormats/CTPPSReadoutObjects/xml/mapping_timing_diamond_2021_fake.xml"),
+                         maskFileNames=cms.vstring()
+)
+)
+)
+process.load('Geometry.VeryForwardGeometry.geometryRPFromDD_2021_cfi')
+process.ctppsDiamondRecHits.applyCalibration = False
 process.DiamondTimingProducer = cms.EDProducer('DiamondTimingProducer',
     #tagDigi = cms.InputTag("ctppsDiamondRawToDigi", "TimingDiamond"),
     #tagRecHit = cms.InputTag("ctppsDiamondRecHits"),

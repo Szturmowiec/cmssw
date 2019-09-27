@@ -194,16 +194,15 @@ void DiamondDetectorClass::ExtractData(const edm::Event& iEvent)
 
 double DiamondDetectorClass::GetTime_SPC(int sector, int station, int plane, int channel)
 {
+	std::cout<<sector<<" "<<station<<" "<<plane<<" "<<channel<<std::endl;
 	double Time_raw = RecHit_map_[ChannelKey(sector,station,plane,channel)].at(0).getT();
 	double ToT = RecHit_map_[ChannelKey(sector,station,plane,channel)].at(0).getToT();
-
 	//TF1 *myfermi = new TF1("myFermi","[0]/(exp((x-[1])/[2])+1)+[3]",0,30);
 
 	double P0 = SPC_map_[ChannelKey(sector,station,plane,channel)].params[0];
 	double P1 = SPC_map_[ChannelKey(sector,station,plane,channel)].params[1];
 	double P2 = SPC_map_[ChannelKey(sector,station,plane,channel)].params[2];
 	double P3 = SPC_map_[ChannelKey(sector,station,plane,channel)].params[3];
-
 	CalibFunc -> SetParameters(P0,P1,P2,P3);
 
 	double Time_SPC = Time_raw - ( CalibFunc-> Eval(ToT) );
